@@ -13,7 +13,7 @@ let brokerStatus = false;
 
 // push notification URL if needed like ELM 
 // https://salamah.api.elm.sa/salamahservices/api/v1/client/rull/alarm-notification
-let url = "https://www.google.com/";
+// let url = "https://www.google.com/";
 
 // var ping = require("ping");
 // let devicesData = [
@@ -50,17 +50,17 @@ var client = mqtt.connect({
   host: "213.192.95.198",
 });
 
-//connect to NAFCO brooker
-var client2 = mqtt.connect('mqtt://true-engineer.cloudmqtt.com',
-{ 
-  username: "ivjutwyy",
-  password: "NaOeLe2ee4WA",
-});
+// //connect to NAFCO brooker
+// var client2 = mqtt.connect('mqtt://true-engineer.cloudmqtt.com',
+// { 
+//   username: "ivjutwyy",
+//   password: "NaOeLe2ee4WA",
+// });
 
 client.on("connect", function (connack) {
   client.subscribe("#", { qos: 2 }, function (err) {
     if (!err) {
-      console.log("Client 1 connected to the broker successfully");
+      console.log("Client connected to the broker successfully");
       brokerStatus = true;
     } else {
       console.log("Failed to connect to the broker");
@@ -69,17 +69,17 @@ client.on("connect", function (connack) {
   });
 });
 
-client2.on("connect", function (connack) {
-  client.subscribe("#", { qos: 2 }, function (err) {
-    if (!err) {
-      console.log("Client 2 connected to the broker successfully");
-      brokerStatus = true;
-    } else {
-      console.log("Failed to connect to the broker");
-      brokerStatus=false;
-    }
-  });
-});
+// client2.on("connect", function (connack) {
+//   client.subscribe("#", { qos: 2 }, function (err) {
+//     if (!err) {
+//       console.log("Client connected to the broker successfully");
+//       brokerStatus = true;
+//     } else {
+//       console.log("Failed to connect to the broker");
+//       brokerStatus=false;
+//     }
+//   });
+// });
 
 
 client.on("disconnect", function () {
@@ -92,7 +92,7 @@ client.on("close", function () {
 });
 
 client.on("offline", function () {
-  console.log("the client2 is offline");
+  console.log("the client is offline");
 });
 
 client.on("message", function (topic, message) {
@@ -135,7 +135,7 @@ client.on("message", function (topic, message) {
   //   // console.log(error);
   // });
 
-  client2.publish(topic, message);
+  // client2.publish(topic, message);
 });
 
 

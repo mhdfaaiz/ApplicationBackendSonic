@@ -197,6 +197,8 @@ display: block;
        var td5 = document.createElement('td');
        var td6 = document.createElement('td');
        var td7 = document.createElement('td');
+       var td8 = document.createElement('td');
+       var td9 = document.createElement('td');
       
        var text0 = document.createTextNode(msg.TIMESTAMP||'');
        var text1 = document.createTextNode(msg.DeviceName||'');
@@ -206,6 +208,8 @@ display: block;
        var text5 = document.createTextNode(msg.VALUE||'');
        var text6 = document.createTextNode(msg.LAT||'');
        var text7 = document.createTextNode(msg.LON||'');
+       var text8 = document.createTextNode(msg.AI1||'');
+       var text9 = document.createTextNode(msg.AI2||'');
       
        td0.appendChild(text0);
        td1.appendChild(text1);
@@ -215,6 +219,8 @@ display: block;
        td5.appendChild(text5);
        td6.appendChild(text6);
        td7.appendChild(text7);
+       td8.appendChild(text8);
+       td9.appendChild(text9);
 
        tr.appendChild(td0);
        tr.appendChild(td1);
@@ -224,6 +230,8 @@ display: block;
        tr.appendChild(td5);
        tr.appendChild(td6);
        tr.appendChild(td7);
+       tr.appendChild(td8);
+       tr.appendChild(td9);
         if(msg.SerialNo==="1883C404764C"){
           tbody.appendChild(tr);
         }
