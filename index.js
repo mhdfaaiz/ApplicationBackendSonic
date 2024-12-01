@@ -24,6 +24,7 @@ let brokerStatus = false;
 
 // MQTT Client setup
 const mqtt = require("mqtt");
+
 const client = mqtt.connect({
   host: process.env.MQTT_HOST || '188.252.40.82', // Default broker host if not set in .env
   port: process.env.MQTT_PORT || 1883, // Default port if not set in .env
@@ -74,7 +75,7 @@ client.on("message", function (topic, message) {
       io.emit("message", JSON.stringify(messageBody));
 
       // Send the data to the frontend via an API (for REST-based access)
-      axios.post('http://localhost:3000/api/mqtt-data', messageBody)
+      axios.post('https://applicationbackendsonic-2.onrender.com/api/mqtt-data', messageBody)
         .then(response => {
           console.log('Data sent to frontend via API:', response.data);
         })
@@ -105,7 +106,7 @@ client.on("message", function (topic, message) {
       io.emit("status", JSON.stringify(messageBody));
 
       // Send the status data to the frontend via Axios
-      axios.post('http://localhost:3000/api/status', messageBody)
+      axios.post('https://applicationbackendsonic-2.onrender.com/api/status', messageBody)
         .then(response => {
           console.log('Status data sent to frontend via API:', response.data);
         })
@@ -158,7 +159,7 @@ client.on("message", function (topic, message) {
       // Make the API request inside an async function
       const sendData = async () => {
         try {
-          const response = await axios.post('http://localhost:3000/api/alarm', formattedMessage);
+          const response = await axios.post('https://applicationbackendsonic-2.onrender.com/api/alarm', formattedMessage);
           console.log('Alarm data sent to frontend via API:', response.data);
         } catch (error) {
           console.error('Error sending alarm data via API:', error);
@@ -209,7 +210,7 @@ app.post('/api/status', (req, res) => {
 
 // Server setup (listening on a given port)
 server.listen(3000, () => {
-  console.log("Server running on http://localhost:3000");
+  console.log("Server running on https://applicationbackendsonic-2.onrender.com");
 });
 
 // Function to convert decimal values to hexadecimal and then to ASCII characters
