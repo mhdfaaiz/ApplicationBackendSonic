@@ -26,7 +26,7 @@ let brokerStatus = false;
 const mqtt = require("mqtt");
 
 const client = mqtt.connect({
-  host: process.env.MQTT_HOST || '188.252.40.82', // Default broker host if not set in .env
+  host: process.env.MQTT_HOST || '3.82.230.201', // Default broker host if not set in .env
   port: process.env.MQTT_PORT || 1883, // Default port if not set in .env
   // You can add other configurations like username, password, etc. if needed
 });
@@ -43,10 +43,12 @@ client.on("connect", function () {
     }
   });
 });
+
+let globalMessageBody;
 // WebSocket connection handling
 io.on("connection", (socket) => {
   console.log("User connected");
-
+  io.emit("status", globalMessageBody)
   // Handle WebSocket disconnection
   socket.on("disconnect", () => {
     console.log("User disconnected");
@@ -101,9 +103,9 @@ client.on("message", function (topic, message) {
 
       // Log the message for debugging
       console.log(topic, messageBody);
-
+      globalMessageBody = messageBody;
       // Emit the processed message to the frontend via WebSocket
-      io.emit("status1", JSON.stringify(messageBody));
+      io.emit("status", JSON.stringify(messageBody));
       console.log(JSON.stringify(messageBody))
 
       // Send the status data to the frontend via Axios
