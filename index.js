@@ -316,6 +316,91 @@ app.post('/api/initialize', async (req, res) => {
   }
 });
 
+//Endpoint for retrieving reverseindicator value from database
+app.get('/api/reverse-indicator/:serialNumber', async (req, res) => {
+  const { serialNumber } = req.params;
+
+  try {
+    const result = await pool.query(
+      'SELECT is_reversed FROM ReverseIndicators WHERE serial_number = $1',
+      [serialNumber]
+    );
+
+    if (result.rows.length > 0) {
+      res.json({ isReversed: result.rows[0].is_reversed });
+    } else {
+      res.status(404).json({ message: 'No data found for this serial number' });
+    }
+  } catch (error) {
+    console.error('Error fetching reverse indicator:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch reverse indicator' });
+  }
+});
+
+// Endpoint for updating reverseindicator value from database
+app.put('/api/reverse-indicator/:serialNumber', async (req, res) => {
+  const { serialNumber } = req.params;
+  const { isReversed } = req.body;
+
+  try {
+    const result = await pool.query(
+      'UPDATE ReverseIndicators SET is_reversed = $1 WHERE serial_number = $2 RETURNING *',
+      [isReversed, serialNumber]
+    );
+
+    if (result.rowCount === 0) {
+      // Insert if not existing
+      await pool.query(
+        'INSERT INTO ReverseIndicators (serial_number, is_reversed) VALUES ($1, $2)',
+        [serialNumber, isReversed]
+      );
+    }
+
+    res.json({ success: true, message: 'Reverse indicator updated successfully' });
+  } catch (error) {
+    console.error('Error updating reverse indicator:', error);
+    res.status(500).json({ success: false, error: 'Failed to update reverse indicator' });
+  }
+});
+
+// Retrieve all indicator colors for a specific serial number
+app.get('/api/indicatoricons/:serialNumber', async (req, res) => {
+  const { serialNumber } = req.params;
+
+  try {
+    const query = `SELECT indicator, color FROM indicatoricons WHERE serial_number = $1`;
+    const { rows } = await pool.query(query, [serialNumber]);
+
+    res.status(200).send(rows);
+  } catch (error) {
+    console.error('Error fetching indicators:', error);
+    res.status(500).send({ message: 'Error fetching indicators' });
+  }
+});
+
+// Save or update indicator color
+app.post('/api/indicatoricons/update', async (req, res) => {
+  const { serial_number, indicator, color } = req.body;
+
+  try {
+    // Upsert query to update if exists, otherwise insert
+    const query = `
+          INSERT INTO indicatoricons (serial_number, indicator, color)
+          VALUES ($1, $2, $3)
+          ON CONFLICT (serial_number, indicator)
+          DO UPDATE SET color = $3
+      `;
+    await pool.query(query, [serial_number, indicator, color]);
+
+    res.status(200).send({ message: 'Indicator color updated successfully' });
+  } catch (error) {
+    console.error('Error updating indicator color:', error);
+    res.status(500).send({ message: 'Error updating indicator color' });
+  }
+});
+
+
+
 // Server setup (listening on a given port)
 server.listen(3000, () => {
   console.log("Server running on http://localhost:3000");
