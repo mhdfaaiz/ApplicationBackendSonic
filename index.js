@@ -29,7 +29,7 @@ let brokerStatus = false;
 const mqtt = require("mqtt");
 
 const client = mqtt.connect({
-  host: process.env.MQTT_HOST || '3.82.230.201', // Default broker host if not set in .env
+  host: process.env.MQTT_HOST || '3.227.99.254', // Default broker host if not set in .env
   port: process.env.MQTT_PORT || 1883, // Default port if not set in .env
   // You can add other configurations like username, password, etc. if needed
 });
@@ -129,16 +129,6 @@ client.on("message", function (topic, message) {
       }
       // Emit the entire dictionary to the frontend
       io.emit("status", clientStatus);
-
-      // Send the status data to the frontend via Axios
-      axios.post('http://localhost:3000/api/status', messageBody)
-        .then(response => {
-          console.log('Status data sent to frontend via API:', response.data);
-        })
-        .catch(error => {
-          console.error('Error sending status data via API:', error);
-        });
-
     } catch (error) {
       console.error('Error processing message from client status:', error);
     }
@@ -274,7 +264,7 @@ app.get('/api/logs', async (req, res) => {
   }
 });
 
-// API endpoint to fetch names and serial numbers
+// API endpoint to fetch names fand serial numbers
 app.get('/api/Serial_List', async (req, res) => {
   try {
     const result = await pool.query('SELECT name, serial_number FROM Serial_List');
