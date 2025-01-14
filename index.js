@@ -29,9 +29,9 @@ let brokerStatus = false;
 const mqtt = require("mqtt");
 
 const client = mqtt.connect({
-  host: process.env.MQTT_HOST || '3.227.99.254', // Default broker host if not set in .env
-  port: process.env.MQTT_PORT || 1883, // Default port if not set in .env
-  // You can add other configurations like username, password, etc. if needed
+  host: process.env.MQTT_HOST || '3.227.99.254',
+  port: process.env.MQTT_PORT || 1883,
+
 });
 
 // MQTT connection handling
@@ -47,6 +47,7 @@ client.on("connect", function () {
   });
 });
 
+// Postgres Client setup
 const pool = new Pool({
   host: process.env.PG_HOST,
   port: process.env.PG_PORT,
@@ -90,7 +91,6 @@ client.on("message", function (topic, message) {
 
       // Construct the final message body
       messageBody = { SerialNo: serialNumber, DeviceName: body, type: "INIT" };
-      console.log(messageBody)
 
       // Emit the message to the frontend via WebSocket (Socket.IO)
       io.emit("message", JSON.stringify(messageBody));
@@ -146,20 +146,13 @@ client.on("message", function (topic, message) {
       const Value = messageBody.VALUE
       const Time = messageBody.TIMESTAMP
 
-
-
       // Construct the final message body
       messageBody = { SerialNo: serialNumber, DeviceName: body, type: "INIT" };
-      console.log(messageBody)
-
-      // Set the type to "ALARM"
-
-
       // Ensure the message has the necessary fields
       const formattedMessage = {
-        timestamp: Time, // assuming the timestamp is now
-        data: Input || "INPUT", // change this as needed
-        status: Value || "VALUE", // change this as needed
+        timestamp: Time,
+        data: Input || "INPUT",
+        status: Value || "VALUE",
         serialno: serialNumber || "SERIAL NUMBER"
       };
       // Set the type to "ALARM"
@@ -169,8 +162,6 @@ client.on("message", function (topic, message) {
 
       // Emit the processed alarm message to the frontend via WebSocket
       io.emit("alarm", JSON.stringify(formattedMessage));
-
-      // Send the alarm data to the frontend via API
       // Make the API request inside an async function
       const sendData = async () => {
         try {
@@ -256,7 +247,7 @@ app.put('/api/indicators/:id', async (req, res) => {
 
 app.get('/api/logs', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM logs');
+    const result = await pool.query('SELECT * FROM logs ORDER BY registered_at ASC');
     res.status(200).json(result.rows);
   } catch (error) {
     console.error('Error fetching logs:', error);
@@ -389,16 +380,16 @@ app.post('/api/indicatoricons/update', async (req, res) => {
   }
 });
 
-
+// Function to convert decimal values to hexadecimal and then to ASCII characters
+function dec_to_hex_to_ascii(str) {
+  return Buffer.from(parseInt(str, 10).toString(16), 'hex').toString('ascii');
+}
 
 // Server setup (listening on a given port)
 server.listen(3000, () => {
   console.log("Server running on http://localhost:3000");
 });
 
-// Function to convert decimal values to hexadecimal and then to ASCII characters
-function dec_to_hex_to_ascii(str) {
-  return Buffer.from(parseInt(str, 10).toString(16), 'hex').toString('ascii');
-}
+
 
 
